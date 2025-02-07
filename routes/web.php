@@ -16,7 +16,8 @@ Route::get('/dashboard', function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // La route index doit être en dernier pour éviter les conflits
+    Route::get('/films/create', [ApiController::class, 'create'])->name('films.create');
+    Route::post('/films', [ApiController::class, 'store'])->name('films.store');
     Route::get('/films/{film}/edit', [ApiController::class, 'edit'])->name('films.edit');
     Route::put('/films/{id}', [ApiController::class, 'update'])->name('films.update');
     Route::delete('/films/{id}', [ApiController::class, 'destroy'])->name('films.destroy');

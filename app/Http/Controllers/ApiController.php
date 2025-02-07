@@ -64,10 +64,7 @@ class ApiController extends Controller
         }
     }
     public function edit(Request $request, $id) {
-        Log::info('Request data:', [
-            'id' => $id,
-            'all_data' => $request->all()
-        ]);
+
         $apiUrl = 'http://localhost:8080/toad/film/getById?id=' . $id;
         try {
             $response = file_get_contents($apiUrl);
@@ -96,7 +93,7 @@ class ApiController extends Controller
                     'title' => $request->input('title'),
                     'description' => $request->input('description'),
                     'releaseYear' => $request->input('releaseYear'),
-                    'languageId' => $film['languageId'] ?? 1, // Utilisez la valeur existante ou une valeur par défaut
+                    'languageId' => $film['languageId'] ?? 1,
                     'originalLanguageId' => $film['originalLanguageId'] ?? 1,
                     'rentalDuration' => $request->input('rentalDuration'),
                     'rentalRate' => $request->input('rentalRate'),
@@ -121,6 +118,45 @@ class ApiController extends Controller
         }
     }
     
+    public function create()
+{
+    return view('films.create');
+}
+
+public function store(Request $request)
+{
+    $apiUrl = 'http://localhost:8080/toad/film/add';
+
+    $client = new \GuzzleHttp\Client();
+
+    try {
+        $response = $client->post($apiUrl, [
+            'form_params' => [
+                'title' => $request->title,
+                'description' => $request->description,
+                'releaseYear' => $request->releaseYear,
+                'languageId' => $request->languageId,
+                'originalLanguageId' => $request->originalLanguageId,
+                'rentalDuration' => $request->rentalDuration,
+                'rentalRate' => $request->rentalRate,
+                'length' => $request->length,
+                'replacementCost' => $request->replacementCost,
+                'rating' => $request->rating,
+                'lastUpdate' => now(),
+                'idDirector' => $request->idDirector,
+            ]
+        ]);
+
+        if ($response->getStatusCode() === 200) {
+            return redirect()->route('films.index')->with('success', 'Film ajouté avec succès.');
+        } else {
+            return redirect()->route('films.create')->with('error', 'Erreur lors de l\'ajout du film.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->route('films.create')->with('error', 'Erreur: ' . $e->getMessage());
+    }
+}
+
 
 
     public function getFilmUpdate($id)
@@ -173,7 +209,7 @@ class ApiController extends Controller
 
     public function destroy($id) {
         $apiUrl = 'http://localhost:8080/toad/film/delete/' . $id;
-        
+
         try {
             $client = new \GuzzleHttp\Client();
             $response = $client->delete($apiUrl);

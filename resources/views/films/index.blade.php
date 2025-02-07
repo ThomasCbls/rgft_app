@@ -24,9 +24,8 @@
                         </svg>
                     </button>
                 </div>
-                <button class="add-button">
-                    Ajouter un film
-                </button>
+                <a href="{{ route('films.create') }}" class="add-button">Ajouter un film</a>
+
 
             <!-- Liste des films -->
             @if (isset($films) && count($films) > 0)
