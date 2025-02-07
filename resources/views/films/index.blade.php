@@ -24,6 +24,9 @@
                         </svg>
                     </button>
                 </div>
+                <button class="add-button">
+                    Ajouter un film
+                </button>
 
             <!-- Liste des films -->
             @if (isset($films) && count($films) > 0)
@@ -218,6 +221,32 @@
             width: 1.25rem;
             height: 1.25rem;
         }
+
+        .add-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #ffffff;
+        background: #2563eb;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .add-button:hover {
+        background: #1e40af;
+        transform: translateY(-2px);
+    }
+
+    .add-button:active {
+        background: #1d4ed8;
+        transform: translateY(0);
+    }
     </style>
 
     <script>
