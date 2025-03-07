@@ -6,12 +6,16 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\PDO;
 
 class ApiController extends Controller
 {
     public function getFilms()
     {
-        $apiUrl = 'http://localhost:8080/toad/film/all';
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        // $apiUrl = 'http://localhost:8080/toad/film/all';
+        $apiUrl = "http://".$serveur.$port."/toad/film/all";
         
         try {
             // Récupérer la réponse JSON du webservice
@@ -87,7 +91,6 @@ class ApiController extends Controller
         try {
             $client = new \GuzzleHttp\Client();
             
-            // Construire l'URL avec les paramètres de requête
             $queryParams = [
                 'query' => [
                     'title' => $request->input('title'),
@@ -125,27 +128,45 @@ class ApiController extends Controller
 
 public function store(Request $request)
 {
-    $apiUrl = 'http://localhost:8080/toad/film/add';
+    // Validation des données avant l'envoi
+    $validatedData = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'releaseYear' => 'required|integer',
+        'languageId' => 'required|integer',
+        'originalLanguageId' => 'nullable|integer',
+        'rentalDuration' => 'required|integer',
+        'rentalRate' => 'required|numeric',
+        'length' => 'required|integer',
+        'replacementCost' => 'required|numeric',
+        'rating' => 'required|string',
+        'idDirector' => 'required|integer',
+    ]);
 
+    $apiUrl = 'http://localhost:8080/toad/film/add';
     $client = new \GuzzleHttp\Client();
 
     try {
         $response = $client->post($apiUrl, [
-            'form_params' => [
-                'title' => $request->title,
-                'description' => $request->description,
-                'releaseYear' => $request->releaseYear,
-                'languageId' => $request->languageId,
-                'originalLanguageId' => $request->originalLanguageId,
-                'rentalDuration' => $request->rentalDuration,
-                'rentalRate' => $request->rentalRate,
-                'length' => $request->length,
-                'replacementCost' => $request->replacementCost,
-                'rating' => $request->rating,
-                'lastUpdate' => now(),
-                'idDirector' => $request->idDirector,
+            'form_params' => [ // On garde form_params pour coller avec les @RequestParam de l'API
+                'title' => $validatedData['title'],
+                'description' => $validatedData['description'],
+                'releaseYear' => $validatedData['releaseYear'],
+                'languageId' => (int) $validatedData['languageId'], // Conversion pour respecter le type attendu
+                'originalLanguageId' => isset($validatedData['originalLanguageId']) ? (int) $validatedData['originalLanguageId'] : null,
+                'rentalDuration' => (int) $validatedData['rentalDuration'],
+                'rentalRate' => (float) $validatedData['rentalRate'],
+                'length' => (int) $validatedData['length'],
+                'replacementCost' => (float) $validatedData['replacementCost'],
+                'rating' => $validatedData['rating'],
+                'lastUpdate' => now()->format('Y-m-d H:i:s'), // Formatage correct du timestamp
+                // 'idDirector' => (int) $validatedData['idDirector'], // Retiré car non utilisé par l'API
             ]
         ]);
+        $statusCode = $response->getStatusCode();
+        $body = $response->getBody()->getContents();
+        
+        Log::info("Réponse API (Status: $statusCode): $body");
 
         if ($response->getStatusCode() === 200) {
             return redirect()->route('films.index')->with('success', 'Film ajouté avec succès.');
@@ -183,46 +204,28 @@ public function store(Request $request)
         }
     }
 
-    public function getFilmDelete($id)
+    public function destroy($id)
     {
-        $apiUrl = 'http://localhost:8080/toad/film/getById?id=' . $id;
+        $deleteUrl = 'http://localhost:8080/toad/film/delete/' . $id;
     
         try {
-            $response = file_get_contents($apiUrl);
-    
-            if ($response === false) {
-                throw new Exception("Erreur lors de l'appel de l'API pour le film.");
-            }
-    
-            $film = json_decode($response, true);
-    
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception("Erreur de décodage JSON : " . json_last_error_msg());
-            }
-    
-            return view('films.detail', compact('film'));
-    
-        } catch (Exception $e) {
-            return view('films.detail', ['error' => $e->getMessage()]);
-        }
-    }
-
-    public function destroy($id) {
-        $apiUrl = 'http://localhost:8080/toad/film/delete/' . $id;
-
-        try {
+            // Suppression du film et de ses données associées (suppression en cascade)
             $client = new \GuzzleHttp\Client();
-            $response = $client->delete($apiUrl);
+            $response = $client->delete($deleteUrl);
     
             if ($response->getStatusCode() === 200) {
-                return redirect()->route('films.index')->with('success', 'Film supprimé avec succès.');
+                // Si l'API répond par un succès, renvoyer un message de succès
+                return redirect()->route('films.index')->with('success', 'Film et ses données associées supprimés avec succès.');
             } else {
+                // Si l'API répond par une erreur, afficher un message d'erreur
                 return redirect()->route('films.index')->with('error', 'Erreur lors de la suppression du film.');
             }
         } catch (\Exception $e) {
+            // En cas d'exception, retourner un message d'erreur
             return redirect()->route('films.index')->with('error', 'Erreur: ' . $e->getMessage());
         }
     }
+    
     
     
 

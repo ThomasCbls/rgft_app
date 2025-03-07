@@ -48,7 +48,7 @@
                                     </li>
                                     <li>
                                     <form action="{{ route('films.destroy', ['id' => $film['filmId']]) }}" method="POST" class="inline">
-                                    @csrf
+                                        @csrf
                                         @method('DELETE')
                                         <button type="submit" class="dropdown-item text-red-600">
                                             Supprimer
@@ -57,7 +57,6 @@
                                     </li>
                                 </ul>
                             </div>
-
                             <!-- Numéro du film -->
                             <div class="film-number">{{ $index + 1 }}</div>
 
