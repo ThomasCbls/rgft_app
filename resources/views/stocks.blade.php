@@ -25,6 +25,7 @@
                     <tr>
                         <th>Titre</th>
                         <th>Stock Disponible</th>
+                        <th>Magasin</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,7 @@
                         <tr>
                             <td>{{ $film['title'] ?? 'Titre inconnu' }}</td>
                             <td>{{ $film['filmsDisponibles'] ?? 'N/A' }}</td>
+                            <td>{{ $film['address'] ?? 'N/A' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -121,15 +123,14 @@
     .search-input {
         flex: 1;
         border: none;
-        padding: 8px;
-        font-size: 14px;
+        padding: 12px 16px;
         outline: none;
     }
 
     .search-button {
         border: none;
         background: none;
-        padding: 5px;
+        padding: 12px;
         cursor: pointer;
         display: flex;
         align-items: center;

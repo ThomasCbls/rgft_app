@@ -44,71 +44,88 @@ class ApiController extends Controller
         }
     }
 
-    public function getFilmsStock()
+    public function getStock()
     {
         $port = env('PORT');
         $serveur = env('SERVEUR');
-        $apiUrl = "http://".$serveur.$port."/toad/inventory/stockFilm";
+    
+        $apiUrlStock = "http://".$serveur.$port."/toad/inventory/stockFilm";
+        $apiUrlStore = "http://".$serveur.$port."/toad/inventory/getStockByStore";
     
         try {
-            $response = file_get_contents($apiUrl);
+            // Appels API
+            $responseStock = file_get_contents($apiUrlStock);
+            $responseStore = file_get_contents($apiUrlStore);
     
-            if ($response === false) {
+            if ($responseStock === false || $responseStore === false) {
                 throw new Exception("Erreur lors de l'appel de l'API.");
             }
     
-            $films = json_decode($response, true);
+            // Décodage JSON
+            $filmsStock = json_decode($responseStock, true);
+            $filmsStore = json_decode($responseStore, true);
     
-            if (!is_array($films) || empty($films)) {
+            if (!is_array($filmsStock) || empty($filmsStock) || !is_array($filmsStore) || empty($filmsStore)) {
                 throw new Exception("Aucun film disponible.");
             }
     
-            // Vérification que chaque film a bien les clés attendues
-            foreach ($films as $film) {
-                if (!isset($film['title']) || !isset($film['filmsDisponibles'])) {
-                    throw new Exception("Données mal formatées");
+            // Création d'un tableau fusionné
+            $films = [];
+    
+            foreach ($filmsStock as $film) {
+                $titre = trim(strtolower($film['title'] ?? ''));
+                $films[$titre] = [
+                    'title' => $film['title'] ?? 'Titre inconnu',
+                    'filmsDisponibles' => $film['filmsDisponibles'] ?? 'N/A',
+                    'address' => 'N/A', // Valeur par défaut si pas trouvée
+                ];
+            }
+    
+            foreach ($filmsStore as $store) {
+                $titre = trim(strtolower($store['title'] ?? ''));
+    
+                if (isset($films[$titre])) {
+                    $films[$titre]['address'] = $store['address'] ?? 'Adresse inconnue';
                 }
             }
     
-            return view('stocks', compact('films'));
+            return view('stocks', ['films' => array_values($films)]);
     
         } catch (Exception $e) {
             return view('stocks', ['error' => $e->getMessage()]);
         }
     }
+    
 
-    public function getFilmsByStore()
-    {
-        $port = env('PORT');
-        $serveur = env('SERVEUR');
-        $apiUrl = "http://".$serveur.$port."/toad/inventory/stockFilm";
+    // public function getFilmsByStore()
+    // {
+
+    //     try {
+    //         $response = file_get_contents($apiUrl);
     
-        try {
-            $response = file_get_contents($apiUrl);
+    //         if ($response === false) {
+    //             throw new Exception("Erreur lors de l'appel de l'API.");
+    //         }
     
-            if ($response === false) {
-                throw new Exception("Erreur lors de l'appel de l'API.");
-            }
+    //         $films = json_decode($response, true);
     
-            $films = json_decode($response, true);
+    //         if (!is_array($films) || empty($films)) {
+    //             throw new Exception("Aucun film disponible.");
+    //         }
     
-            if (!is_array($films) || empty($films)) {
-                throw new Exception("Aucun film disponible.");
-            }
+    //         // Vérification que chaque film a bien les clés attendues
+    //         foreach ($films as $film) {
+    //             if (!isset($film['address'])) {
+    //                 throw new Exception("Données mal formatées");
+    //             }
+    //         }
     
-            // Vérification que chaque film a bien les clés attendues
-            foreach ($films as $film) {
-                if (!isset($film['title']) || !isset($film['filmsDisponibles'])) {
-                    throw new Exception("Données mal formatées");
-                }
-            }
+    //         return view('stocks', compact('films'));
     
-            return view('stocks', compact('films'));
-    
-        } catch (Exception $e) {
-            return view('stocks', ['error' => $e->getMessage()]);
-        }
-    }
+    //     } catch (Exception $e) {
+    //         return view('stocks', ['error' => $e->getMessage()]);
+    //     }
+    // }
     
     
     

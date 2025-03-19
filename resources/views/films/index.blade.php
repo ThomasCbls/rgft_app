@@ -6,19 +6,26 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Barre de recherche + Bouton d'ajout -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="relative w-full max-w-md">
-                    <input type="search" id="searchQuery" class="search-input" placeholder="Rechercher un film...">
-                    <button class="search-button">
-                        <img src="{{ asset('img/loupe.png') }}" alt="Search" class="search-icon">
-                    </button>
+            <div style="display: flex; flex-direction: column; width: 100%;">
+                <!-- Conteneur principal avec flex -->
+                <div style="display: flex; flex-direction: row; width: 100%;">
+                    <!-- Barre de recherche -->
+                    <div class="search-container" style="flex: 80%;margin-left:20px;">
+                        <input type="search" id="searchQuery" class="search-input" placeholder="Rechercher un film..." style="width: 100%;">
+                        <button class="search-button">
+                            <img src="{{ asset('img/loupe.png') }}" alt="Search" class="search-icon">
+                        </button>
+                    </div>
+                    <!-- Bouton d'ajout -->
+                    <div style="flex: 20%; display: flex; align-items: center; justify-content: center;">
+                        <a href="{{ route('films.create') }}" class="add-button" style="height: 40px;">
+                            ➕ Ajouter un film
+                        </a>
+                    </div>
                 </div>
-                <a href="{{ route('films.create') }}" class="add-button">
-                    ➕ Ajouter un film
-                </a>
             </div>
+
+    </div>
 
             <!-- Liste des films -->
             @if (isset($films) && count($films) > 0)
@@ -207,12 +214,12 @@
         .search-container {
             display: flex;
             align-items: center;
-            border: 1px solid #e5e7eb;
-            border-radius: 9999px;
-            overflow: hidden;
-            background: white;
-            width: 100%;
-            max-width: 400px;
+            width: 300px;
+            margin: 10px auto;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            background: #fff;
         }
 
         .search-input {
@@ -241,7 +248,7 @@
             font-size: 14px;
             font-weight: 500;
             color: #fff;
-            background: #2563eb;
+            background:rgb(37, 129, 235);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -249,7 +256,7 @@
         }
 
         .add-button:hover {
-            background: #1e40af;
+            background:rgb(78, 90, 194);
         }
     </style>
 </x-app-layout>

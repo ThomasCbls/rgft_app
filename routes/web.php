@@ -25,10 +25,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/films', [ApiController::class, 'getFilms'])->name('films.index');
 });
 
-
-Route::get('/stocks', [ApiController::class, 'getFilmsStock'])
-    ->middleware(['auth', 'verified'])
-    ->name('stocks');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/stocks', [ApiController::class, 'getStock'])->name('stocks');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -44,7 +43,7 @@ Route::get('/films/{filmId}', [ApiController::class, 'getFilmDetail'])->name('de
 
 //Route::post('someurl', 'YourController@someMethod');
 
-Route::get('/panier', [PanierController::class, 'index'])->name('panier');
+// Route::get('/panier', [PanierController::class, 'index'])->name('panier');
 // Route::post('/panier/ajouter', [PanierController::class, 'ajouter'])->name('panier.ajouter');
 // Route::delete('/panier/supprimer/{id}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
 // Route::delete('/panier/vider', [PanierController::class, 'vider'])->name('panier.vider');
