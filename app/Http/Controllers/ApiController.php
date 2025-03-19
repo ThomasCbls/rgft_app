@@ -44,6 +44,75 @@ class ApiController extends Controller
         }
     }
 
+    public function getFilmsStock()
+    {
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $apiUrl = "http://".$serveur.$port."/toad/inventory/stockFilm";
+    
+        try {
+            $response = file_get_contents($apiUrl);
+    
+            if ($response === false) {
+                throw new Exception("Erreur lors de l'appel de l'API.");
+            }
+    
+            $films = json_decode($response, true);
+    
+            if (!is_array($films) || empty($films)) {
+                throw new Exception("Aucun film disponible.");
+            }
+    
+            // Vérification que chaque film a bien les clés attendues
+            foreach ($films as $film) {
+                if (!isset($film['title']) || !isset($film['filmsDisponibles'])) {
+                    throw new Exception("Données mal formatées");
+                }
+            }
+    
+            return view('stocks', compact('films'));
+    
+        } catch (Exception $e) {
+            return view('stocks', ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function getFilmsByStore()
+    {
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $apiUrl = "http://".$serveur.$port."/toad/inventory/stockFilm";
+    
+        try {
+            $response = file_get_contents($apiUrl);
+    
+            if ($response === false) {
+                throw new Exception("Erreur lors de l'appel de l'API.");
+            }
+    
+            $films = json_decode($response, true);
+    
+            if (!is_array($films) || empty($films)) {
+                throw new Exception("Aucun film disponible.");
+            }
+    
+            // Vérification que chaque film a bien les clés attendues
+            foreach ($films as $film) {
+                if (!isset($film['title']) || !isset($film['filmsDisponibles'])) {
+                    throw new Exception("Données mal formatées");
+                }
+            }
+    
+            return view('stocks', compact('films'));
+    
+        } catch (Exception $e) {
+            return view('stocks', ['error' => $e->getMessage()]);
+        }
+    }
+    
+    
+    
+
     public function getFilmDetail($id)
     {
         $apiUrl = 'http://localhost:8080/toad/film/getById?id=' . $id;

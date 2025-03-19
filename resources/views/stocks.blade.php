@@ -7,203 +7,137 @@
     <br>
 
     <div class="search-container">
-        <input type="search" class="search-input" placeholder="Rechercher">
-        <button class="search-button">
-             <img src="{{ asset('img/loupe.png') }}" alt="Search" class="search-icon">
-        </button>
+        <input type="search" id="searchQuery" class="search-input" placeholder="Rechercher un film...">
+            <button class="search-button">
+                <img src="{{ asset('img/loupe.png') }}" alt="Search" class="search-icon">
+            </button>
     </div>
-    
-    <script>
-    function performSearch() {
-        const query = document.getElementById('searchQuery').value;
-        if (query) {
-            window.location.href = `/search?query=${encodeURIComponent(query)}`;
-        } else {
-            alert('Veuillez entrer une recherche.');
-        }
-    }
-</script>
-    
-    <br>
-    
-    <div class="wrapper" style="position: relative;">
 
+    
+<br>
 
-    <!-- Liste des films -->
-    @if (isset($films) && count($films) > 0)
-        <ol role="list" class="film-grid">
-            @foreach ($films as $film)
-                <li>
-                    <div>
-                        <strong>Titre :</strong> 
-                        <a href="{{ route('stocks', ['filmId' => $film['filmId']]) }}">
-                            {{ $film['title'] ?? 'Titre inconnu' }}
-                         </a>
-                    </div>
-                    <div>
-                        <input class="styled" type="button" value="Ajouter" />
-                    </div>
-                </li>
-            @endforeach
-        </ol>
-    @else
-        <p>Aucun film disponible.</p>
-    @endif
-</div>
-
-<script>
-    // Fonction pour afficher/masquer le menu déroulant
-    function toggleMenu() {
-        const menu = document.getElementById('dropdownMenu');
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'block';
-        } else {
-            menu.style.display = 'none';
-        }
-    }
-</script>
+    <div class="wrapper">
+        @if (isset($error))
+            <p style="color: red;">{{ $error }}</p>
+        @elseif (isset($films) && count($films) > 0)
+            <table class="stock-table">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Stock Disponible</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($films as $film)
+                        <tr>
+                            <td>{{ $film['title'] ?? 'Titre inconnu' }}</td>
+                            <td>{{ $film['filmsDisponibles'] ?? 'N/A' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p>Aucun film disponible.</p>
+        @endif
+    </div>
 </x-app-layout>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchQuery");
+        const rows = document.querySelectorAll(".stock-table tbody tr");
+
+        searchInput.addEventListener("input", function() {
+            const searchValue = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const title = row.querySelector("td:first-child").textContent.toLowerCase();
+                
+                if (title.includes(searchValue)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: "Open Sans", sans-serif;
-        margin: 0;
-        padding: 1rem;
-    }
-
+    /* Centrer et limiter la largeur du tableau */
     .wrapper {
-        max-width: 1200px;
+        max-width: 800px;
         margin: 0 auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    ol.film-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem; 
-        list-style: none;
-        padding: 0;
+    /* Style du tableau */
+    .stock-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     }
 
-    li {
-        background: aliceblue;
-        padding: 1.5rem;
-        border-radius: 1rem;
-        box-shadow: 0.25rem 0.25rem 0.75rem rgb(0 0 0 / 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+    .stock-table th, .stock-table td {
+        padding: 12px;
+        text-align: left;
     }
 
-    li::before {
-        counter-increment: list-item;
-        content: counter(list-item);
-        font-size: 2rem;
-        font-weight: 700;
-        width: 2em;
-        height: 2em;
-        background: black;
-        border-radius: 50%;
+    .stock-table th {
+        background: #0077cc;
         color: white;
+        font-weight: bold;
+    }
+
+    .stock-table tr {
+        transition: background 0.3s ease;
+    }
+
+    .stock-table tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+
+    .stock-table tr:hover {
+        background: #e3f2fd;
+    }
+
+    /* Style de la barre de recherche */
+    .search-container {
         display: flex;
-        justify-content: center;
         align-items: center;
-        margin-bottom: 1rem;
+        width: 300px;
+        margin: 10px auto;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 25px;
+        background: #fff;
     }
 
-    li:nth-child(even) {
-        background: lavender;
+    .search-input {
+        flex: 1;
+        border: none;
+        padding: 8px;
+        font-size: 14px;
+        outline: none;
     }
 
-    a {
-        color: #0077cc;
-        text-decoration: none;
+    .search-button {
+        border: none;
+        background: none;
+        padding: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
     }
 
-    a:hover {
-        text-decoration: underline;
+    .search-icon {
+        width: 16px;
+        height: 16px;
     }
-
-    @media (max-width: 768px) {
-        ol.film-grid {
-            grid-template-columns: 1fr; /* responsive */
-        }
-    }
-    .styled {
-  border: 0;
-  line-height: 2.5;
-  padding: 0 20px;
-  margin-left: 75%;
-  font-size: 1rem;
-  text-align: center;
-  color: #fff;
-  text-shadow: 1px 1px 1px #000;
-  border-radius: 50px;
-  background-color: rgba(0, 0, 0, 1);
-  background-image: linear-gradient(
-    to top left,
-    rgba(0, 0, 0, 0.2),
-    rgba(0, 0, 0, 0.2) 30%,
-    rgba(0, 0, 0, 0)
-  );
-  box-shadow:
-    inset 2px 2px 3px rgba(255, 255, 255, 0.6),
-    inset -2px -2px 3px rgba(0, 0, 0, 0.5);
-}
-
-.styled:hover {
-  background-color: rgba(255, 0, 0, 1);
-}
-
-.styled:active {
-  box-shadow:
-    inset -2px -2px 3px rgba(255, 255, 255, 0.6),
-    inset 2px 2px 3px rgba(0, 0, 0, 0.6);
-}
-
-label {
-  display: block;
-  font:
-    1rem 'Fira Sans',
-    sans-serif;
-}
-
-.search-container {
-    display: flex;
-    align-items: center;
-    max-width: 300px;
-    /* margin: 0 auto; */
-    border: 1px solid #ccc;
-    border-radius: 30px;
-    overflow: hidden;
-    background-color: #fff;
-}
-
-.search-input {
-    flex: 1;
-    border: none;
-    padding: 10px;
-    font-size: 1rem;
-    outline: none;
-    border-radius: 0;
-}
-
-.search-button {
-    border: none;
-    background: none;
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.search-icon {
-    width: 20px;
-    height: 20px;
-}
-
 </style>
+

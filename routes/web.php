@@ -26,11 +26,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::get('/stocks', function () {
-    return view('stocks');
-})->middleware(['auth', 'verified'])->name('stocks');
-
-Route::get('/stocks', [ApiController::class, 'getFilms'])->name('stocks');
+Route::get('/stocks', [ApiController::class, 'getFilmsStock'])
+    ->middleware(['auth', 'verified'])
+    ->name('stocks');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -51,10 +49,5 @@ Route::get('/panier', [PanierController::class, 'index'])->name('panier');
 // Route::delete('/panier/supprimer/{id}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
 // Route::delete('/panier/vider', [PanierController::class, 'vider'])->name('panier.vider');
 
-
-Route::get('/stocks', [ApiController::class, 'getAllStocks'])->name('stocks');
-Route::get('/stocks/{id}', [ApiController::class, 'getStockDetail'])->name('stocks.show');
-Route::get('/stocks/{id}/update', [ApiController::class, 'getStockUpdate'])->name('stocks.update');
-Route::get('/stocks/{id}/delete', [ApiController::class, 'getStockDelete'])->name('stocks.delete');
 
 require __DIR__.'/auth.php';

@@ -1,31 +1,24 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight text-center">
-            {{ __('Liste DVD') }}
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 text-center">
+            {{ __('Liste des DVDs') }}
         </h2>
     </x-slot>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Barre de recherche -->
-                <div class="search-container max-w-md mx-auto">
-                    <input 
-                        type="search" 
-                        id="searchQuery"
-                        name="query"
-                        class="search-input" 
-                        placeholder="Rechercher"
-                        required
-                    >
-                    <button type="submit" class="search-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+            <!-- Barre de recherche + Bouton d'ajout -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="relative w-full max-w-md">
+                    <input type="search" id="searchQuery" class="search-input" placeholder="Rechercher un film...">
+                    <button class="search-button">
+                        <img src="{{ asset('img/loupe.png') }}" alt="Search" class="search-icon">
                     </button>
                 </div>
-                <a href="{{ route('films.create') }}" class="add-button">Ajouter un film</a>
-
+                <a href="{{ route('films.create') }}" class="add-button">
+                    ➕ Ajouter un film
+                </a>
+            </div>
 
             <!-- Liste des films -->
             @if (isset($films) && count($films) > 0)
@@ -34,29 +27,27 @@
                         <li class="film-card">
                             <!-- Menu contextuel -->
                             <div class="menu-container">
-                                <button 
-                                    onclick="toggleMenu({{ $film['filmId'] }})" 
-                                    class="menu-button"
-                                >
+                                <button onclick="toggleMenu({{ $film['filmId'] }})" class="menu-button">
                                     ☰
                                 </button>
                                 <ul id="dropdownMenu-{{ $film['filmId'] }}" class="dropdown-menu">
                                     <li>
-                                    <a href="{{ route('films.edit', $film['filmId']) }}" class="dropdown-item">
-                                        Modifier
-                                    </a>
+                                        <a href="{{ route('films.edit', $film['filmId']) }}" class="dropdown-item">
+                                            ✏ Modifier
+                                        </a>
                                     </li>
                                     <li>
-                                    <form action="{{ route('films.destroy', ['id' => $film['filmId']]) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="dropdown-item text-red-600">
-                                            Supprimer
-                                        </button>
-                                    </form>
+                                        <form action="{{ route('films.destroy', ['id' => $film['filmId']]) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-red-600">
+                                                ❌ Supprimer
+                                            </button>
+                                        </form>
                                     </li>
                                 </ul>
                             </div>
+
                             <!-- Numéro du film -->
                             <div class="film-number">{{ $index + 1 }}</div>
 
@@ -67,7 +58,6 @@
                                     {{ $film['title'] ?? 'Titre inconnu' }}
                                 </a>
                             </div>
-
                         </li>
                     @endforeach
                 </ol>
@@ -77,22 +67,70 @@
         </div>
     </div>
 
-    <style>
-        .film-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            list-style: none;
-            padding: 0;
-            margin: 0;
+    <!-- Script pour la recherche en direct -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("searchQuery");
+            const filmCards = document.querySelectorAll(".film-card");
+
+            searchInput.addEventListener("input", function() {
+                const searchValue = searchInput.value.toLowerCase();
+
+                filmCards.forEach(card => {
+                    const title = card.querySelector(".film-title").textContent.toLowerCase();
+                    
+                    if (title.includes(searchValue)) {
+                        card.style.display = "block";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        });
+
+        function toggleMenu(filmId) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== `dropdownMenu-${filmId}`) {
+                    menu.classList.remove('active');
+                }
+            });
+
+            const menu = document.getElementById(`dropdownMenu-${filmId}`);
+            menu.classList.toggle('active');
         }
 
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.menu-container')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+        });
+    </script>
+
+    <!-- Styles améliorés -->
+    <style>
+        /* Grille des films */
+        .film-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 0;
+            list-style: none;
+        }
+
+        /* Carte de film */
         .film-card {
-            background: white;
+            background: #fff;
             padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: relative;
+            transition: transform 0.2s;
+        }
+
+        .film-card:hover {
+            transform: translateY(-5px);
         }
 
         .film-number {
@@ -116,47 +154,25 @@
         .film-link {
             color: #2563eb;
             text-decoration: none;
+            font-weight: bold;
         }
 
         .film-link:hover {
             text-decoration: underline;
         }
 
-        .add-button {
-            display: block;
-            width: auto;
-            margin-left: auto;
-            padding: 0.5rem 1.5rem;
-            background: black;
-            color: white;
-            border: none;
-            border-radius: 9999px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .add-button:hover {
-            background: #dc2626;
-        }
-
+        /* Menu contextuel */
         .menu-container {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 10px;
+            right: 10px;
         }
 
         .menu-button {
             background: none;
             border: none;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             cursor: pointer;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-        }
-
-        .menu-button:hover {
-            background: #f3f4f6;
         }
 
         .dropdown-menu {
@@ -165,9 +181,9 @@
             right: 0;
             top: 100%;
             background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            min-width: 8rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
             z-index: 50;
         }
 
@@ -177,20 +193,17 @@
 
         .dropdown-item {
             display: block;
-            padding: 0.5rem 1rem;
+            padding: 8px 12px;
             color: #374151;
             text-decoration: none;
             cursor: pointer;
-            width: 100%;
-            text-align: left;
-            border: none;
-            background: none;
         }
 
         .dropdown-item:hover {
             background: #f3f4f6;
         }
 
+        /* Barre de recherche */
         .search-container {
             display: flex;
             align-items: center;
@@ -198,17 +211,19 @@
             border-radius: 9999px;
             overflow: hidden;
             background: white;
+            width: 100%;
+            max-width: 400px;
         }
 
         .search-input {
             flex: 1;
             border: none;
-            padding: 0.75rem 1rem;
+            padding: 12px 16px;
             outline: none;
         }
 
         .search-button {
-            padding: 0.75rem;
+            padding: 12px;
             background: none;
             border: none;
             cursor: pointer;
@@ -216,58 +231,25 @@
         }
 
         .search-icon {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: 20px;
+            height: 20px;
         }
 
+        /* Bouton Ajouter */
         .add-button {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 14px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #ffffff;
-        background: #2563eb;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .add-button:hover {
-        background: #1e40af;
-        transform: translateY(-2px);
-    }
-
-    .add-button:active {
-        background: #1d4ed8;
-        transform: translateY(0);
-    }
-    </style>
-
-    <script>
-        function toggleMenu(filmId) {
-            // Ferme tous les menus ouverts
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                if (menu.id !== `dropdownMenu-${filmId}`) {
-                    menu.classList.remove('active');
-                }
-            });
-
-            // Bascule le menu actuel
-            const menu = document.getElementById(`dropdownMenu-${filmId}`);
-            menu.classList.toggle('active');
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        // Ferme les menus si on clique en dehors
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.menu-container')) {
-                document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                    menu.classList.remove('active');
-                });
-            }
-        });
-    </script>
+        .add-button:hover {
+            background: #1e40af;
+        }
+    </style>
 </x-app-layout>
