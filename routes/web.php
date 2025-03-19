@@ -13,8 +13,6 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/films/create', [ApiController::class, 'create'])->name('films.create');
     Route::post('/films', [ApiController::class, 'store'])->name('films.store');
@@ -40,13 +38,5 @@ Route::get('/detail', function () {
 })->middleware(['auth', 'verified'])->name('detail');
 
 Route::get('/films/{filmId}', [ApiController::class, 'getFilmDetail'])->name('detail');
-
-//Route::post('someurl', 'YourController@someMethod');
-
-// Route::get('/panier', [PanierController::class, 'index'])->name('panier');
-// Route::post('/panier/ajouter', [PanierController::class, 'ajouter'])->name('panier.ajouter');
-// Route::delete('/panier/supprimer/{id}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
-// Route::delete('/panier/vider', [PanierController::class, 'vider'])->name('panier.vider');
-
 
 require __DIR__.'/auth.php';

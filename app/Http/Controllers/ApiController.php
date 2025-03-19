@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\PDO;
 
 class ApiController extends Controller
 {
@@ -14,23 +13,17 @@ class ApiController extends Controller
     {
         $port = env('PORT');
         $serveur = env('SERVEUR');
-        // $apiUrl = 'http://localhost:8080/toad/film/all';
         $apiUrl = "http://".$serveur.$port."/toad/film/all";
         
         try {
-            // Récupérer la réponse JSON du webservice
             $response = file_get_contents($apiUrl);
         
-            // Vérifier si la réponse est valide
             if ($response === false) {
                 throw new Exception("Erreur lors de l'appel de l'API.");
             }
         
-            // Décoder la réponse JSON en tableau associatif PHP
             $films = json_decode($response, true);
             
-        
-            // Vérifier si le JSON est bien décodé
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("Erreur de décodage JSON : " . json_last_error_msg());
             }
@@ -77,7 +70,7 @@ class ApiController extends Controller
                 $films[$titre] = [
                     'title' => $film['title'] ?? 'Titre inconnu',
                     'filmsDisponibles' => $film['filmsDisponibles'] ?? 'N/A',
-                    'address' => 'N/A', // Valeur par défaut si pas trouvée
+                    'address' => 'N/A',
                 ];
             }
     
@@ -95,44 +88,13 @@ class ApiController extends Controller
             return view('stocks', ['error' => $e->getMessage()]);
         }
     }
-    
-
-    // public function getFilmsByStore()
-    // {
-
-    //     try {
-    //         $response = file_get_contents($apiUrl);
-    
-    //         if ($response === false) {
-    //             throw new Exception("Erreur lors de l'appel de l'API.");
-    //         }
-    
-    //         $films = json_decode($response, true);
-    
-    //         if (!is_array($films) || empty($films)) {
-    //             throw new Exception("Aucun film disponible.");
-    //         }
-    
-    //         // Vérification que chaque film a bien les clés attendues
-    //         foreach ($films as $film) {
-    //             if (!isset($film['address'])) {
-    //                 throw new Exception("Données mal formatées");
-    //             }
-    //         }
-    
-    //         return view('stocks', compact('films'));
-    
-    //     } catch (Exception $e) {
-    //         return view('stocks', ['error' => $e->getMessage()]);
-    //     }
-    // }
-    
-    
-    
 
     public function getFilmDetail($id)
     {
-        $apiUrl = 'http://localhost:8080/toad/film/getById?id=' . $id;
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+
+        $apiUrl = 'http://'.$serveur.$port.'/toad/film/getById?id=' . $id;
     
         try {
             $response = file_get_contents($apiUrl);
@@ -155,7 +117,9 @@ class ApiController extends Controller
     }
     public function edit(Request $request, $id) {
 
-        $apiUrl = 'http://localhost:8080/toad/film/getById?id=' . $id;
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $apiUrl = 'http://'.$serveur.$port.'/toad/film/getById?id=' . $id;
         try {
             $response = file_get_contents($apiUrl);
             if ($response === false) {
@@ -172,7 +136,9 @@ class ApiController extends Controller
     }
 
     public function update(Request $request, $id) {
-        $apiUrl = 'http://localhost:8080/toad/film/update/' . $id;
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $apiUrl = 'http://'.$serveur.$port.'/toad/film/update/' . $id;
     
         try {
             $client = new \GuzzleHttp\Client();
@@ -229,7 +195,9 @@ public function store(Request $request)
         'idDirector' => 'required|integer',
     ]);
 
-    $apiUrl = 'http://localhost:8080/toad/film/add';
+    $port = env('PORT');
+    $serveur = env('SERVEUR');
+    $apiUrl = 'http://'.$serveur.$port.'/toad/film/add';
     $client = new \GuzzleHttp\Client();
 
     try {
@@ -268,7 +236,9 @@ public function store(Request $request)
 
     public function getFilmUpdate($id)
     {
-        $apiUrl = 'http://localhost:8080/toad/film/getById?id=' . $id;
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $apiUrl = 'http://'.$serveur.$port.'/toad/film/getById?id=' . $id;
     
         try {
             $response = file_get_contents($apiUrl);
@@ -292,7 +262,9 @@ public function store(Request $request)
 
     public function destroy($id)
     {
-        $deleteUrl = 'http://localhost:8080/toad/film/delete/' . $id;
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $deleteUrl = 'http://'.$serveur.$port.'/toad/film/delete/' . $id;
     
         try {
             // Suppression du film et de ses données associées (suppression en cascade)
@@ -317,7 +289,9 @@ public function store(Request $request)
 
     public function getRentalLivraison($id)
     {
-        $apiUrl = 'http://localhost:8080/toad/rental/films-en-cours';
+        $port = env('PORT');
+        $serveur = env('SERVEUR');
+        $apiUrl = 'http://'.$serveur.$port.'/toad/rental/films-en-cours';
     
         try {
             $response = file_get_contents($apiUrl);
@@ -341,7 +315,9 @@ public function store(Request $request)
 
     public function getStockDetail($id)
 {
-    $apiUrl = 'http://localhost:8080/toad/inventory/getById?id=' . $id; // L'URL de l'API pour un stock spécifique
+    $port = env('PORT');
+    $serveur = env('SERVEUR');
+    $apiUrl = 'http://'.$serveur.$port.'/toad/inventory/getById?id=' . $id; // L'URL de l'API pour un stock spécifique
     
     try {
         // Récupérer la réponse JSON du webservice
@@ -370,7 +346,9 @@ public function store(Request $request)
 
 public function getStockUpdate($id)
 {
-    $apiUrl = 'http://localhost:8080/toad/inventory/getById?id=' . $id; // L'URL de l'API pour un stock spécifique
+    $port = env('PORT');
+    $serveur = env('SERVEUR');
+    $apiUrl = 'http://'.$serveur.$port.'/toad/inventory/getById?id=' . $id; // L'URL de l'API pour un stock spécifique
     
     try {
         // Récupérer la réponse JSON du webservice
@@ -400,7 +378,9 @@ public function getStockUpdate($id)
 
 public function getAllStocks()
 {
-    $apiUrl = 'http://localhost:8080/toad/inventory/all'; // L'URL de l'API pour récupérer les stocks
+    $port = env('PORT');
+    $serveur = env('SERVEUR');
+    $apiUrl = 'http://'.$serveur.$port.'/toad/inventory/all'; // L'URL de l'API pour récupérer les stocks
     
     try {
         // Récupérer la réponse JSON du webservice
@@ -429,7 +409,9 @@ public function getAllStocks()
 }
 public function getStockDelete($id)
 {
-    $apiUrl = 'http://localhost:8080/toad/inventory/delete/' . $id; // L'URL de l'API pour supprimer un stock spécifique
+    $port = env('PORT');
+    $serveur = env('SERVEUR');
+    $apiUrl = 'http://'.$serveur.$port.'/toad/inventory/delete/' . $id; // L'URL de l'API pour supprimer un stock spécifique
     
     try {
         // Récupérer la réponse JSON du webservice (ici on s'attend à un status de réussite)

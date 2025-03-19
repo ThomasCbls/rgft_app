@@ -12,10 +12,7 @@
                 <img src="{{ asset('img/loupe.png') }}" alt="Search" class="search-icon">
             </button>
     </div>
-
-    
 <br>
-
     <div class="wrapper">
         @if (isset($error))
             <p style="color: red;">{{ $error }}</p>

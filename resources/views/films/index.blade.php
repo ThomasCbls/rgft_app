@@ -7,7 +7,6 @@
 
     <div class="py-8">
             <div style="display: flex; flex-direction: column; width: 100%;">
-                <!-- Conteneur principal avec flex -->
                 <div style="display: flex; flex-direction: row; width: 100%;">
                     <!-- Barre de recherche -->
                     <div class="search-container" style="flex: 80%;margin-left:20px;">
@@ -74,7 +73,6 @@
         </div>
     </div>
 
-    <!-- Script pour la recherche en direct -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const searchInput = document.getElementById("searchQuery");
