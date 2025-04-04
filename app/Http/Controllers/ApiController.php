@@ -489,5 +489,12 @@ public function login(Request $request)
     }
 }
 
+public function lougout(Request $request)
+{
+   
+  return redirect()->route('films.index')->with('success', 'Connexion réussie.');
+
+}
+
 
 }

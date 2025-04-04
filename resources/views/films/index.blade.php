@@ -198,7 +198,7 @@
 
         .dropdown-item {
             display: block;
-            padding: 8px 12px;
+            padding: 8px 8px;
             color: #374151;
             text-decoration: none;
             cursor: pointer;
