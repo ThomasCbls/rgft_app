@@ -11,12 +11,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-    server: {
-        host: '192.168.8.80',
-        port: 5177,
-        strictPort: true,
-        hmr: {
-            host: '192.168.8.80', 
-        },
-    },
+    // server: {
+    //     host: '192.168.8.80',
+    //     port: 5177,
+    //     strictPort: true,
+    //     hmr: {
+    //         host: '192.168.8.80', 
+    //     },
+    // },
 });
